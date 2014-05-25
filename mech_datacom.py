@@ -65,4 +65,6 @@ class DatacomMechanismDriver(api.MechanismDriver):
         pass
 
     def delete_port_postcommit(self, context):
-        pass
+         """After transaction is done."""
+
+       pass
