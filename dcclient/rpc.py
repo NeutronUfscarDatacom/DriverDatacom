@@ -1,105 +1,55 @@
-import requests
-from oslo.config import cfg
+import pycurl
 import gzip
-import collections
-import StringIO
-import re
-
+from StringIO import StringIO as sio
+from urllib import urlencode
+from oslo.config import cfg
 
 class RPC:
     """ RPC class. Used to connect to the client and pass the XML files.
     """
     def __init__(self):
-        self.auth = (cfg.CONF.dm_username, cfg.CONF.dm_password)
+        self.auth = self.CONF.dm_username+':'+self.CONF.dm_password
         self.host = cfg.CONF.dm_host
-        self.port = 80  # will be changed on production, might be added to conf
+        self.method = cfg.CONF.method
 
-        # Create the base payload, with the common attributes
-        self.base_payload = collections.OrderedDict()
+    def _create_url(self):
+        return self.method+'://'+self.auth+'@'+self.host+\
+               '/System/File/file_config.html'
 
-        # File upload, as opposed to firmware
-        self.base_payload['page'] = (
-            '',
-            StringIO.StringIO('file_upload'),
-            'text/plain',
-            {'Content-Transfer-Encoding': '8bit'}
-            )
-
-        # Flash that the startup will use
-        self.base_payload['startup_upload'] = (
-            '',
-            StringIO.StringIO('4'),
-            'text/plain',
-            {'Content-Transfer-Encoding': '8bit'}
-            )
-
-        # Apply without shutting down the ports
-        self.base_payload['apply_ports_up'] = (
-            '',
-            StringIO.StringIO('1'),
-            'text/plain',
-            {'Content-Transfer-Encoding': '8bit'}
-            )
-
-        # Flash in which the configuration will be saved
-        self.base_payload['saving'] = (
-            '',
-            StringIO.StringIO('4'),
-            'text/plain',
-            {'Content-Transfer-Encoding': '8bit'}
-            )
-
-        # Add this configuration to the current, as opposed to overriding it
-        self.base_payload['running_part'] = (
-            '',
-            StringIO.StringIO('1'),
-            'text/plain',
-            {'Content-Transfer-Encoding': '8bit'}
-            )
-
-        # Set the bounday that the switch will be expecting
-        self.expected_boundary = '-oundaryboundaryboundaryboundaryBug13141'
 
     def send_xml(self, xml):
-        """Send the XML to the switch.
-        The xml has to be in plain text format
-        """
+        c = pycurl.Curl()
 
-        # Zipping the XML file.
-        xml_gz = StringIO.StringIO()
-        with gzip.GzipFile(fileobj=xml_gz, mode="w") as f:
-            f.write(xml)
+        #ignore ssl certificate verification
+        if self.method is 'https'
+            c.setopt(c.SSL_VERIFYPEER, 0)
+            c.setopt(c.SSL_VERIFYHOST, 0)
 
-        # Creating the payload.
-        payload = self.base_payload.copy()
+        #set url being used
+        c.setopt(c.URL, self._create_url())
 
-        payload['file_to_upload'] = (
-            'nms_config',
-            xml_gz.getvalue(),
-            'application/octet-stream',
-            {'Content-Transfer-Encoding': 'binary'}
-            )
+        #oppening and zipping the xml file
+        with open('teste.xml', 'r') as xml_file:
+            xml_content = xml_file.read()
 
-        # Creating the request
-        request = requests.Request(
-            "POST",
-            'https://192.168.0.13/System/File/file_config.html',
-            files=payload,
-            auth=('admin', 'admin')
-            )
+        ziped = sio()
+        with gzip.GzipFile(fileobj=ziped, mode='w') as f:
+            f.write(xml_content)
 
-        prepared_request = request.prepare()
+        run_data = ziped.getvalue()
 
-        # Fixing the boundary
-        self.update_boundary(prepared_request, self.expected_boundary)
+        #sets necessary multipart fields and adds the zip from buffer
+        data = [('page', 'file_upload'),
+               ('running_part', '1'),
+               ('file_to_upload', (c.FORM_BUFFER, 'upate_config',
+                                  c.FORM_BUFFERPTR, run_data))]
 
-        # Sending the HTTP request
-        session = requests.Session()
-        session.send(prepared_request,  # THIS IS A SNAKEOIL WORKAROUND
-                     cert=('certs/ssl-cert-snakeoil.pem',
-                           'certs/ssl-cert-snakeoil.key'),
-                     verify=False
-                     )
+        #sets POST method and the multipart packet
+        c.setopt(c.HTTPPOST, data)
+
+        #executes curl and exits
+        c.perform()
+        c.close()
 
     def _update_boundary(self, req, bound):
         """ Update the request with the expected boundary
