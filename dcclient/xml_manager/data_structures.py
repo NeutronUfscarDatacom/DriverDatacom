@@ -1,6 +1,8 @@
 """ Data structures used to build the XML
 """
 
+import xml.etree.ElementTree as ET
+
 
 class Pbits(object):
     """ Class pbits represents bitmasks (usually from ports)
@@ -30,7 +32,10 @@ class Pbits(object):
     def as_xml(self):
         """ Method that returns the xml form of the object
         """
-        return '<pbits id0="0">'+str(self.bits)+'</pbits>'
+        xml = ET.Element("pbits")
+        xml.attrib["id0"] = "0"
+        xml.text = str(self.bits)
+        return xml
 
 
 class Vlan_global(object):
@@ -84,17 +89,13 @@ class Vlan_global(object):
     def as_xml(self):
         """ Method that returns the xml form of the object
         """
-        return '''
-<vlan_global id0="%d">
-   <vid> %d </vid>
-   <active> 1 </active>
-   <pbmp_untagged id="0">
-      %s
-   </pbmp_untagged>
-</vlan_global>
-''' % (self.vid,  # the vid that goes in the vlan_global array
-       self.vid,  # the vid that goes in the <vid> field
-       self.ports.as_xml())  # the bitmask that associate the ports
+        xml = ET.Element("vlan_global")
+        xml.attrib["id0"] = str(self.vid)
+        ET.SubElement(xml, "vid").text = str(self.vid)
+        ET.SubElement(xml, "active").text = "1"
+        pmbp_untagged = ET.SubElement(xml, "pmbp_untagged", {"id0": "0"})
+        pmbp_untagged.append(self.ports.as_xml())
+        return xml
 
 
 class Cfg_data(object):
@@ -107,3 +108,10 @@ class Interface(object):
     """ Class interface represents a switch interface
     """
     pass
+
+
+if __name__ == '__main__':
+    vlan = Vlan_global()
+    ports = Pbits([2, 3, 6])
+
+    vlan.ports = ports
