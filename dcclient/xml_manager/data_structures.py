@@ -36,7 +36,65 @@ class Pbits(object):
 class Vlan_global(object):
     """ Class vlanglobal represents a VLan.
     """
-    pass
+    # TODO: adicionar checagens de limites nas properties
+
+    _name = ''
+    _vid = 0
+    _ports = Pbits(0)
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        assert type(name) is str
+        self._name = name
+
+    @name.deleter
+    def name(self):
+        self._name = ''
+
+    @property
+    def vid(self):
+        return self._vid
+
+    @vid.setter
+    def vid(self, vid):
+        assert type(vid) is int
+        self._vid = vid
+
+    @vid.deleter
+    def vid(self):
+        self._vid = 0
+
+    @property
+    def ports(self):
+        return self._ports
+
+    @ports.setter
+    def ports(self, ports):
+        assert isinstance(ports, Pbits)
+        self._ports = ports
+
+    @ports.deleter
+    def ports(self):
+        self.ports = Pbits(0)
+
+    def as_xml(self):
+        """ Method that returns the xml form of the object
+        """
+        return '''
+<vlan_global id0="%d">
+   <vid> %d </vid>
+   <active> 1 </active>
+   <pbmp_untagged id="0">
+      %s
+   </pbmp_untagged>
+</vlan_global>
+''' % (self.vid,  # the vid that goes in the vlan_global array
+       self.vid,  # the vid that goes in the <vid> field
+       self.ports.as_xml())  # the bitmask that associate the ports
 
 
 class Cfg_data(object):
