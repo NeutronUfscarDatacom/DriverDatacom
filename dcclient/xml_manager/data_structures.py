@@ -37,6 +37,9 @@ class Pbits(object):
         xml.text = str(self.bits)
         return xml
 
+    def as_xml_text(self):
+        return ET.dump(self.as_xml())
+
 
 class Vlan_global(object):
     """ Class vlanglobal represents a VLan.
@@ -97,11 +100,42 @@ class Vlan_global(object):
         pmbp_untagged.append(self.ports.as_xml())
         return xml
 
+    def as_xml_text(self):
+        return ET.dump(self.as_xml())
+
 
 class Cfg_data(object):
     """ One class to contain them all
     """
-    pass
+    _vlans = []
+
+    @property
+    def vlans(self):
+        return self._vlans
+
+    @vlans.setter
+    def vlans(self, vlans):
+        assert type(vlans) is list
+        # first check if every member of the list is a vlan
+        for vlan in vlans:
+            assert isinstance(vlan, Vlan_global)
+
+        #now add each vlan
+        for vlan in vlans:
+            self._vlans.append(vlan)
+
+    @vlans.deleter
+    def vlans(self):
+        self._vlans = []
+
+    def as_xml(self):
+        xml = ET.Element("cfg_data")
+        for vlan in self.vlans:
+            xml.append(vlan.as_xml())
+        return xml
+
+    def as_xml_text(self):
+        return ET.dump(self.as_xml())
 
 
 class Interface(object):
@@ -115,3 +149,6 @@ if __name__ == '__main__':
     ports = Pbits([2, 3, 6])
 
     vlan.ports = ports
+
+    c = Cfg_data()
+    c.vlans = [vlan]
