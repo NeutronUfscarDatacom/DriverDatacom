@@ -39,6 +39,24 @@ class Pbits(object):
     def as_xml_text(self):
         return ET.dump(self.as_xml())
 
+    def add_bits(self, bits):
+        assert type(bits) is int or type(bits) is list
+        if type(bits) is int:
+            new_bits = bits
+        else:
+            new_bits = sum([1 << (i-1) for i in set(bits)])
+
+        self.bits = self.bits | new_bits
+
+    def remove_bits(self, bits):
+        assert type(bits) is int or type(bits) is list
+        if type(bits) is int:
+            new_bits = bits
+        else:
+            new_bits = sum([1 << (i-1) for i in set(bits)])
+
+        self.bits = self.bits & ~ new_bits
+
 
 class Vlan_global(object):
     """ Class vlanglobal represents a VLan.
