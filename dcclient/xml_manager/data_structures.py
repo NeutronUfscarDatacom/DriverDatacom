@@ -2,13 +2,15 @@
 """
 
 import xml.etree.ElementTree as ET
+import utils
 
 
 class Pbits(object):
     """ Class pbits represents bitmasks (usually from ports)
     """
 
-    _bits = 0
+    def __init__(self, bits):
+        self.bits = bits
 
     @property
     def bits(self):
@@ -25,9 +27,6 @@ class Pbits(object):
     @bits.deleter
     def bits(self):
         self._bits = 0
-
-    def __init__(self, bits):
-        self.bits = bits
 
     def as_xml(self):
         """ Method that returns the xml form of the object
@@ -46,9 +45,10 @@ class Vlan_global(object):
     """
     # TODO: adicionar checagens de limites nas properties
 
-    _name = ''
-    _vid = 0
-    _ports = Pbits(0)
+    def __init__(self, vid):
+        self._name = ''
+        self.vid = vid
+        self._ports = None
 
     @property
     def name(self):
@@ -70,6 +70,7 @@ class Vlan_global(object):
     @vid.setter
     def vid(self, vid):
         assert type(vid) is int
+        assert vid >= utils.MIN_VLAN and vid <= utils.MAX_VLAN
         self._vid = vid
 
     @vid.deleter
@@ -87,7 +88,7 @@ class Vlan_global(object):
 
     @ports.deleter
     def ports(self):
-        self.ports = Pbits(0)
+        self.ports = None
 
     def as_xml(self):
         """ Method that returns the xml form of the object
@@ -96,8 +97,11 @@ class Vlan_global(object):
         xml.attrib["id0"] = str(self.vid)
         ET.SubElement(xml, "vid").text = str(self.vid)
         ET.SubElement(xml, "active").text = "1"
-        pmbp_untagged = ET.SubElement(xml, "pmbp_untagged", {"id0": "0"})
-        pmbp_untagged.append(self.ports.as_xml())
+        if self.name:
+            ET.SubElement(xml, "name").text = self.name
+        if self.ports:
+            pmbp_untagged = ET.SubElement(xml, "pmbp_untagged", {"id0": "0"})
+            pmbp_untagged.append(self.ports.as_xml())
         return xml
 
     def as_xml_text(self):
@@ -107,7 +111,8 @@ class Vlan_global(object):
 class Cfg_data(object):
     """ One class to contain them all
     """
-    _vlans = []
+    def __init__(self):
+        self._vlans = []
 
     @property
     def vlans(self):
@@ -120,7 +125,7 @@ class Cfg_data(object):
         for vlan in vlans:
             assert isinstance(vlan, Vlan_global)
 
-        #now add each vlan
+        # now add each vlan
         for vlan in vlans:
             self._vlans.append(vlan)
 
@@ -145,7 +150,8 @@ class Interface(object):
 
 
 if __name__ == '__main__':
-    vlan = Vlan_global()
+    pass
+    vlan = Vlan_global(42)
     ports = Pbits([2, 3, 6])
 
     vlan.ports = ports
