@@ -37,7 +37,7 @@ class Pbits(object):
         return xml
 
     def as_xml_text(self):
-        return ET.dump(self.as_xml())
+        return ET.tostring(self.as_xml())
 
     def add_bits(self, bits):
         assert type(bits) is int or type(bits) is list
@@ -123,7 +123,7 @@ class Vlan_global(object):
         return xml
 
     def as_xml_text(self):
-        return ET.dump(self.as_xml())
+        return ET.tostring(self.as_xml())
 
 
 class Cfg_data(object):
@@ -158,7 +158,7 @@ class Cfg_data(object):
         return xml
 
     def as_xml_text(self):
-        return ET.dump(self.as_xml())
+        return ET.tostring(self.as_xml())
 
 
 class Interface(object):
