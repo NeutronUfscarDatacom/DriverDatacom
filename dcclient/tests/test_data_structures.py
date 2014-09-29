@@ -30,8 +30,8 @@ class main_test(testtools.TestCase):
 
         expected_xml = '<vlan_global id0="42"><vid>42</vid><active>1' + \
                        '</active><name>vlan_test</name>' + \
-                       '<pmbp_untagged id0="0"><pbits id0="0">13</pbits>' + \
-                       '</pmbp_untagged></vlan_global>'
+                       '<pbmp_untagged id0="0"><pbits id0="0">13</pbits>' + \
+                       '</pbmp_untagged></vlan_global>'
 
         actual_xml = vlan.as_xml_text()
 
@@ -46,8 +46,8 @@ class main_test(testtools.TestCase):
 
         expected_xml = '<cfg_data><vlan_global id0="42"><vid>42</vid>' + \
                        '<active>1</active><name>vlan_test</name>' + \
-                       '<pmbp_untagged id0="0"><pbits id0="0">13</pbits>' + \
-                       '</pmbp_untagged></vlan_global></cfg_data>'
+                       '<pbmp_untagged id0="0"><pbits id0="0">13</pbits>' + \
+                       '</pbmp_untagged></vlan_global></cfg_data>'
 
         actual_xml = cfg.as_xml_text()
 

@@ -7,6 +7,16 @@ import utils
 
 class Pbits(object):
     """ Class pbits represents bitmasks (usually from ports)
+
+        This class has one property:
+            bits: Internally this property is implemented as an integer.
+                  It can be set by using either an integer or a list that
+                  will be converted to the corresponding integer.
+                  For example using it with class.bits = [1,3,4] will
+                  result in an integer with the bits 1, 3, 4 set (1101)=13.
+
+        To instantiate this class you need the following parameters:
+            bits (required): int or list.
     """
 
     def __init__(self, bits):
@@ -60,13 +70,29 @@ class Pbits(object):
 
 class Vlan_global(object):
     """ Class vlanglobal represents a VLan.
+
+        This class has three properties:
+            vid: This property is an integer. It is used as the id of the vlan.
+            ports: This property is a pbits. Ultimatly is used as a binary,
+                   this binary is what defines wich ports asociated with the
+                   vlan. the add_bits and remove_birs methods are used to
+                   change this property hence changing the ports.
+            name: This property is a string. It is used to refer to the vlan
+                  in a more friendly way, rather then using the vid.
+
+        To instantiate this class you need the following parameters:
+            vid (required): int.
+            name (optional): string.
+            ports (optional): Pbits.
     """
     # TODO: adicionar checagens de limites nas properties
 
-    def __init__(self, vid):
-        self._name = ''
+    def __init__(self, vid, name='', ports=None):
         self.vid = vid
-        self._ports = None
+        if ports:
+            self.ports = ports
+        if name:
+            self.name = name
 
     @property
     def name(self):
@@ -118,8 +144,8 @@ class Vlan_global(object):
         if self.name:
             ET.SubElement(xml, "name").text = self.name
         if self.ports:
-            pmbp_untagged = ET.SubElement(xml, "pmbp_untagged", {"id0": "0"})
-            pmbp_untagged.append(self.ports.as_xml())
+            pbmp_untagged = ET.SubElement(xml, "pbmp_untagged", {"id0": "0"})
+            pbmp_untagged.append(self.ports.as_xml())
         return xml
 
     def as_xml_text(self):
@@ -128,9 +154,18 @@ class Vlan_global(object):
 
 class Cfg_data(object):
     """ One class to contain them all
+
+        This class has one property:
+            vlans: This property is a vlan_global. The cfg_data is the main
+                   class to the xml, so it will receive everything that is
+                   needed to the xml.
+
+        To instantiate this class you need the following parameters:
+            vlans (optional): list (elements of type Vlan_global).
     """
-    def __init__(self):
-        self._vlans = []
+
+    def __init__(self, vlans=[]):
+        self.vlans = vlans
 
     @property
     def vlans(self):
@@ -143,7 +178,9 @@ class Cfg_data(object):
         for vlan in vlans:
             assert isinstance(vlan, Vlan_global)
 
-        # now add each vlan
+        # now create the list and add each vlan
+        self._vlans = []
+
         for vlan in vlans:
             self._vlans.append(vlan)
 

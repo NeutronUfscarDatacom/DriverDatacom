@@ -21,7 +21,7 @@ class RPC:
                '/System/File/file_config.html'
 
 
-    def send_xml(self):
+    def send_xml(self, xml_content):
         """ Method used to send a given xml file to the switches
         """
         req = pycurl.Curl()
@@ -33,10 +33,6 @@ class RPC:
 
         #set url being used
         req.setopt(req.URL, self._create_url())
-
-        #oppening and zipping the xml file
-        with open('teste.xml', 'r') as xml_file:
-            xml_content = xml_file.read()
 
         ziped = sio()
         with gzip.GzipFile(fileobj=ziped, mode='w') as gzip_file:
