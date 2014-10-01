@@ -87,12 +87,10 @@ class Vlan_global(object):
     """
     # TODO: adicionar checagens de limites nas properties
 
-    def __init__(self, vid, name='', ports=None):
+    def __init__(self, vid, name='', ports=Pbits(0)):
         self.vid = vid
-        if ports:
-            self.ports = ports
-        if name:
-            self.name = name
+        self.ports = ports
+        self.name = name
 
     @property
     def name(self):
