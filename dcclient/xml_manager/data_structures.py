@@ -165,8 +165,11 @@ class Cfg_data(object):
             vlans (optional): list (elements of type Vlan_global).
     """
 
-    def __init__(self, vlans=[]):
-        self.vlans = vlans
+    def __init__(self, vlans=None):
+        if not vlans:
+            self.vlans = vlans
+        else:
+            self.vlans = []
 
     @property
     def vlans(self):
@@ -206,7 +209,6 @@ class Interface(object):
 
 
 if __name__ == '__main__':
-    pass
     vlan = Vlan_global(42)
     ports = Pbits([2, 3, 6])
 
