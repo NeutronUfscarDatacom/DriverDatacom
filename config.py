@@ -1,7 +1,7 @@
 from oslo.config import cfg
 
 """ Configuration for the datacom switch.
- 
+
 The options are used to locate datacom switches and identify
 openstack. The dm_username and dm_password are the credentials
 and the dm_host is the IP for the switch. The region name is the
@@ -17,7 +17,7 @@ DATACOM_DRIVER_OPTS = [
                default='',
                secret=True,  # do not expose value in the logs
                help=_('(required) Password for the dm connection.'
-                      'If not set, the identification will fail'.)),
+                      'If not set, the identification will fail.')),
     cfg.StrOpt('dm_host',
                default='',
                help=_('(required) IP to be connected to..'
@@ -29,4 +29,6 @@ DATACOM_DRIVER_OPTS = [
                       'value will be "RegionOne", which is the default value '))
 ]
 
-cfg.CONF.register_opts(DATACOM_DRIVER_OPTS, "ml2_datacom")
+
+def setup_config():
+    cfg.CONF.register_opts(DATACOM_DRIVER_OPTS, "ml2_datacom")

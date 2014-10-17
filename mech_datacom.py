@@ -18,6 +18,11 @@ from oslo.config import cfg
 
 from neutron.plugins.ml2 import driver_api as api
 
+
+import config
+config.setup_config()
+
+
 class DatacomDriver(api.MechanismDriver):
     """    """
     def __init__(self):
