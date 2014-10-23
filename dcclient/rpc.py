@@ -3,18 +3,17 @@
 import pycurl
 import gzip
 from StringIO import StringIO as sio
-from oslo.config import cfg
 
 class RPC:
     """ RPC class. Used to connect to the client and pass the XML files.
     """
-    def __init__(self):
-        self.auth = self.CONF.dm_username+':'+self.CONF.dm_password
-        self.host = cfg.CONF.dm_host
-        self.method = cfg.CONF.method
+    def __init__(self, username, password, host, method):
+        self.auth = username+':'+password
+        self.host = host
+        self.method = method
 
     def _create_url(self):
-        """ Internal method that returns the switches' URLs given the cfg
+        """ Internal method that returns the switches' URLs given the cfg 
         attributes.
         """
         return self.method+'://'+self.auth+'@'+self.host+\

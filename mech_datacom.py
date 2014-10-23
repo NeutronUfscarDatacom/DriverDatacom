@@ -26,6 +26,7 @@ config.setup_config()
 class DatacomDriver(api.MechanismDriver):
     """    """
     def __init__(self):
+        import pudb; pudb.set_trace() # BREAKPOINT
         pass
 
     def initialize(self):
