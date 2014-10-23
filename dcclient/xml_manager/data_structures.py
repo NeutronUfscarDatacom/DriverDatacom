@@ -2,7 +2,7 @@
 """
 
 import xml.etree.ElementTree as ET
-import utils
+import neutron.plugins.ml2.drivers.datacom.utils
 
 
 class Pbits(object):
@@ -166,7 +166,7 @@ class Cfg_data(object):
     """
 
     def __init__(self, vlans=None):
-        if not vlans:
+        if vlans:
             self.vlans = vlans
         else:
             self.vlans = []
