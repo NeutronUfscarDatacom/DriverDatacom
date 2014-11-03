@@ -6,8 +6,11 @@ import rpc
 from xml_manager.manager import ManagedXml
 
 
+from neutron.openstack.common import log as logger
 from oslo.config import cfg
 
+
+LOG = logger.getLogger(__name__)
 
 class Manager:
     def __init__(self):
@@ -24,5 +27,8 @@ class Manager:
     def create_network(self, vlan):
         """ Creates a new network on the switch, if it does not exist already.
         """
-        self.xml.addVlan(vlan)
-        self._update()
+        try:
+            self.xml.addVlan(vlan)
+            self._update()
+        except:
+            LOG.info("Trying to create already existing network %d:", vlan)
