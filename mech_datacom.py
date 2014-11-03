@@ -18,6 +18,8 @@ from oslo.config import cfg
 
 from neutron.plugins.ml2 import driver_api as api
 
+from dcclient.dcclient import Manager
+
 
 import config
 config.setup_config()
@@ -29,7 +31,7 @@ class DatacomDriver(api.MechanismDriver):
         pass
 
     def initialize(self):
-        pass
+        self.dcclient = Manager()
 
     def create_network_precommit(self, context):
         """Within transaction."""
@@ -37,7 +39,8 @@ class DatacomDriver(api.MechanismDriver):
 
     def create_network_postcommit(self, context):
         """After transaction is done."""
-        pass
+        vlan = int(context.network_segments[0]['segmentation_id'])
+        self.dcclient.create_network(vlan)
 
     def update_network_precommit(self, context):
         """Within transaction."""
