@@ -2,7 +2,7 @@
 """
 
 import xml.etree.ElementTree as ET
-import neutron.plugins.ml2.drivers.datacom.utils
+import neutron.plugins.ml2.drivers.datacom.utils as utils
 
 
 class Pbits(object):
